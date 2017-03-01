@@ -11,10 +11,10 @@ package assignment4;
  * Slip days used: <0>
  * Fall 2016
  */
-
-
+//There a 3 premade critters with different fight trends
+//We just have to fill in the stuff here 
 import java.util.List;
-
+import java.lang.reflect.Constructor;
 /* see the PDF for descriptions of the methods and fields in this class
  * you may add fields, methods or inner classes to Critter ONLY if you make your additions private
  * no new public, protected or default-package code or data can be added to Critter
@@ -47,22 +47,29 @@ public abstract class Critter {
 	private int energy = 0;
 	protected int getEnergy() { return energy; }
 	
+	////////////Traits of the Critter////////////
 	private int x_coord;
 	private int y_coord;
 	
+	/* to do*/ 
 	protected final void walk(int direction) {
 	}
 	
+	/* to do*/ 
 	protected final void run(int direction) {
 		
 	}
 	
+	/* to do*/ 
 	protected final void reproduce(Critter offspring, int direction) {
 	}
 
 	public abstract void doTimeStep();
 	public abstract boolean fight(String oponent);
 	
+	
+	
+	/* to do*/ 
 	/**
 	 * create and initialize a Critter subclass.
 	 * critter_class_name must be the unqualified name of a concrete subclass of Critter, if not,
@@ -73,9 +80,29 @@ public abstract class Critter {
 	 * @param critter_class_name
 	 * @throws InvalidCritterException
 	 */
+	
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
+		//plug in error later in stage 3 
+		Class<?> newCritterCons = null; 
+		
+		//need try catches for checking valid constructors
+		try{
+			Constructor build = null; 
+			build = newCritterCons.getConstructor(); 
+			// Critter Initialization
+			//!!!!!!If we add traits, add it here too!!!!!!
+			Object newCrit = build.newInstance(); 
+			((Critter) newCrit).x_coord = Critter.getRandomInt(Params.world_width);
+			((Critter) newCrit).y_coord = Critter.getRandomInt(Params.world_height);
+			((Critter) newCrit).energy = Params.start_energy;
+			population.add((Critter) newCrit);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 	
+	/* to do */ 
 	/**
 	 * Gets a list of critters of a specific type.
 	 * @param critter_class_name What kind of Critter is to be listed.  Unqualified class name.
@@ -83,12 +110,33 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
+		//given
 		List<Critter> result = new java.util.ArrayList<Critter>();
-	
+		
+		//stackover and git says to do this 
+		Class<?> crit = null;
+		
+		//try to get class of critter from string
+		try {
+			crit = Class.forName(critter_class_name);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//check instances of that class in the population 
+		for (Critter a : population) {
+			if (crit.isInstance(a)) {
+				result.add(a);
+			}
+		}
 		return result;
 	}
 	
+	
 	/**
+	 * Given
+	 * Don't edit
 	 * Prints out how many Critters of each type there are on the board.
 	 * @param critters List of Critters.
 	 */
@@ -121,6 +169,8 @@ public abstract class Critter {
 	 * using some sort of external grid or some other data structure in addition
 	 * to the x_coord and y_coord functions, then you MUST update these setter functions
 	 * so that they correctly update your grid/data structure.
+	 * 
+	 *  >>ADD functions if we add private traits/varaibles <<<<<
 	 */
 	static abstract class TestCritter extends Critter {
 		protected void setEnergy(int new_energy_value) {
@@ -143,7 +193,8 @@ public abstract class Critter {
 			return super.y_coord;
 		}
 		
-
+		
+		/* to do */ 
 		/*
 		 * This method getPopulation has to be modified by you if you are not using the population
 		 * ArrayList that has been provided in the starter code.  In any case, it has to be
@@ -153,6 +204,8 @@ public abstract class Critter {
 			return population;
 		}
 		
+		
+		//?????
 		/*
 		 * This method getBabies has to be modified by you if you are not using the babies
 		 * ArrayList that has been provided in the starter code.  In any case, it has to be
@@ -163,9 +216,12 @@ public abstract class Critter {
 			return babies;
 		}
 	}
+	
+	//end of test_critter
 
 	/**
 	 * Clear the world of all critters, dead and alive
+	 * These functions are part of abstract class
 	 */
 	public static void clearWorld() {
 		// Complete this method.
@@ -173,9 +229,15 @@ public abstract class Critter {
 	
 	public static void worldTimeStep() {
 		// Complete this method.
+		//doTimeStep 
+		//move/run/walk/fight
+		//update energy 
+		//have babies?
 	}
 	
 	public static void displayWorld() {
 		// Complete this method.
+		//does the ASCII Art 
+		
 	}
 }
