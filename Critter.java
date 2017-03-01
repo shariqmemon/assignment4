@@ -50,21 +50,169 @@ public abstract class Critter {
 	////////////Traits of the Critter////////////
 	private int x_coord;
 	private int y_coord;
+	private boolean move; 
 	
-	/* to do*/ 
-	protected final void walk(int direction) {
+	/**
+	 * Makes the bugs go around the world like 312
+	 * @param movement
+	 * @return
+	 */
+	private int outOfBoundsX(int movement){
+		if (x_coord + movement < 0){
+			return (Params.world_width - movement);
+		}
+		if ((x_coord + movement) > (Params.world_width - 1)){
+			return (movement - 1); 
+		}
+		else{
+			return (x_coord += movement); 
+		}
 	}
 	
-	/* to do*/ 
-	protected final void run(int direction) {
+	/**
+	 * Makes the bugs go around the world like in 312
+	 * @param movement
+	 * @return
+	 */
+	private int outOfBoundsY(int movement){
+		if (y_coord + movement < 0){
+			return (Params.world_height - movement);
+		}
+		if ((y_coord + movement) > (Params.world_height - 1)){
+			return (movement - 1); 
+		}
+		else{
+			return (y_coord = y_coord + movement); 
+		}
+	}
+	
+	/***
+	 * Move bug  1 square based on compass given in PDF
+	 * lower the y the closer to the top
+	 * lower the x the closer to the left
+	 * Each direction checks if outofBounds to see if goes to different edge
+	 * @param direction
+	 */
+	protected final void walk(int direction) {
+		//check if critter has moved 
+		if (this.move == true){
+			return; 
+		}
+		//else move the critter
+		//east/right
+		if (direction == 0){
+			x_coord = outOfBoundsX(1); 
+		}
 		
+		//northeast/up-right
+		if (direction == 1){
+			x_coord = outOfBoundsX(1); 
+			y_coord = outOfBoundsY(-1); 
+		}
+		
+		//north
+		if (direction == 2){
+			y_coord = outOfBoundsY(-1); 
+		}
+		
+		//northwest
+		if (direction == 3){
+			x_coord = outOfBoundsX(-1); 
+			y_coord = outOfBoundsY(-1); 
+		}
+		
+		//west
+		if (direction == 4){
+			x_coord = outOfBoundsX(-1); 
+		}
+		
+		//SW
+		if (direction == 5){
+			x_coord = outOfBoundsX(-1); 
+			y_coord = outOfBoundsY(1); 
+		}
+		
+		//S
+		if (direction == 6){
+			y_coord = outOfBoundsY(1); 
+		}
+		
+		//SE
+		if (direction == 7){
+			x_coord = outOfBoundsX(1); 
+			y_coord = outOfBoundsY(1); 
+		}
+		//update info
+		energy = energy - Params.walk_energy_cost; 
+		this.move = true; 
+	}
+	
+	/**
+	 * Same as walk but 2 squares
+	 * @param direction
+	 */
+	protected final void run(int direction) {
+		//check if critter has moved 
+		if (this.move == true){
+			return; 
+		}
+		//else move the critter
+		//east/right
+		if (direction == 0){
+			x_coord = outOfBoundsX(2); 
+		}
+		
+		//northeast/up-right
+		if (direction == 1){
+			x_coord = outOfBoundsX(2); 
+			y_coord = outOfBoundsY(-2); 
+		}
+		
+		//north
+		if (direction == 2){
+			y_coord = outOfBoundsY(-2); 
+		}
+		
+		//northwest
+		if (direction == 3){
+			x_coord = outOfBoundsX(-2); 
+			y_coord = outOfBoundsY(-2); 
+		}
+		
+		//west
+		if (direction == 4){
+			x_coord = outOfBoundsX(-2); 
+		}
+		
+		//SW
+		if (direction == 5){
+			x_coord = outOfBoundsX(-2); 
+			y_coord = outOfBoundsY(2); 
+		}
+		
+		//S
+		if (direction == 6){
+			y_coord = outOfBoundsY(2); 
+		}
+		
+		//SE
+		if (direction == 7){
+			x_coord = outOfBoundsX(2); 
+			y_coord = outOfBoundsY(2); 
+		}
+		//update info
+		energy = energy - Params.walk_energy_cost; 
+		this.move = true; 
 	}
 	
 	/* to do*/ 
 	protected final void reproduce(Critter offspring, int direction) {
 	}
 
+	// abstract so don't edit here
 	public abstract void doTimeStep();
+	
+	// abstract so don't edit here
 	public abstract boolean fight(String oponent);
 	
 	
@@ -81,6 +229,9 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	
+	
+	//Needs to be tested 
+	//Needs to have an exception thing
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		//plug in error later in stage 3 
 		Class<?> newCritterCons = null; 
@@ -102,7 +253,7 @@ public abstract class Critter {
 		}
 	}
 	
-	/* to do */ 
+	/* Needs to Be Tested */ 
 	/**
 	 * Gets a list of critters of a specific type.
 	 * @param critter_class_name What kind of Critter is to be listed.  Unqualified class name.
