@@ -68,9 +68,36 @@ public class Main {
         }
 
         /* Do not alter the code above for your submission. */
+        
+        ///////////////////////////////////////////////////////////////
         /* Write your code below. */
         
-        // System.out.println("GLHF");
+        //////////////////////Testing Block//////////////////////////////
+        //Running 
+        System.out.println("GLHF");
+        //constructor - changed craig to test babies
+        try{
+        	Critter.makeCritter("assignment4.Craig");
+        }
+        catch (InvalidCritterException e){
+        	System.out.println("No Craig");
+        }
+        //view
+        Critter.displayWorld();
+        //walk/time step/babies 
+        Craig.worldTimeStep();
+        Critter.displayWorld(); 
+        //delete/clear world 
+        Critter.clearWorld(); 
+        Critter.displayWorld();
+        int x = 10; 
+        x ++; 
+        ////////////////////////////////////////////////////////////////
+        
+      
+        
+      
+        
         
         /* Write your code above */
         System.out.flush();
