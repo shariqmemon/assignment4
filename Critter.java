@@ -1,4 +1,5 @@
 package assignment4;
+import java.util.Iterator;
 /* CRITTERS Critter.java
  * EE422C Project 4 submission by
  * Replace <...> with your actual data.
@@ -40,7 +41,6 @@ public abstract class Critter {
 		rand = new java.util.Random(new_seed);
 	}
 	
-	
 	/* a one-character long string that visually depicts your critter in the ASCII interface */
 	public String toString() { return ""; }
 	
@@ -51,6 +51,7 @@ public abstract class Critter {
 	private int x_coord;
 	private int y_coord;
 	private boolean move; 
+	private boolean isAlive; 
 	
 	/**
 	 * Makes the bugs go around the world like 312
@@ -65,7 +66,7 @@ public abstract class Critter {
 			return (movement - 1); 
 		}
 		else{
-			return (x_coord += movement); 
+			return (x_coord + movement); 
 		}
 	}
 	
@@ -82,7 +83,7 @@ public abstract class Critter {
 			return (movement - 1); 
 		}
 		else{
-			return (y_coord = y_coord + movement); 
+			return (y_coord + movement); 
 		}
 	}
 	
@@ -205,8 +206,70 @@ public abstract class Critter {
 		this.move = true; 
 	}
 	
-	/* to do*/ 
+	/**
+	 * Makes a baby 
+	 * Assign it as alive 
+	 * Then uses walk code to give it a spot 
+	 * @param offspring
+	 * @param direction
+	 */
 	protected final void reproduce(Critter offspring, int direction) {
+		if (this.energy < Params.min_reproduce_energy){
+			return; 
+		}
+		//else babies
+		offspring.energy = (this.energy / 2); 
+		this.energy = (int)Math.ceil(this.energy/2); 
+		//east/right
+		if (direction == 0){
+			offspring.x_coord = this.outOfBoundsX(1); 
+			offspring.y_coord = this.y_coord; 
+		}
+		
+		//northeast/up-right
+		if (direction == 1){
+			offspring.x_coord = this.outOfBoundsX(1); 
+			offspring.y_coord = this.outOfBoundsY(-1); 
+		}
+		
+		//north
+		if (direction == 2){
+			offspring.y_coord = this.outOfBoundsY(-1); 
+			offspring.x_coord = this.x_coord; 
+		}
+		
+		//northwest
+		if (direction == 3){
+			offspring.x_coord = this.outOfBoundsX(-1); 
+			offspring.y_coord = this.outOfBoundsY(-1); 
+		}
+		
+		//west
+		if (direction == 4){
+			offspring.x_coord = this.outOfBoundsX(-1); 
+			offspring.y_coord = this.y_coord; 
+		}
+		
+		//SW
+		if (direction == 5){
+			offspring.x_coord = this.outOfBoundsX(-1); 
+			offspring.y_coord = this.outOfBoundsY(1); 
+		}
+		
+		//S
+		if (direction == 6){
+			offspring.y_coord = this.outOfBoundsY(1); 
+			offspring.x_coord = this.x_coord; 
+		}
+		
+		//SE
+		if (direction == 7){
+			offspring.x_coord = this.outOfBoundsX(1); 
+			offspring.y_coord = this.outOfBoundsY(1); 
+		}
+		//may need to be moved depending on rules 
+		offspring.isAlive = true; 
+		babies.add(offspring); 
 	}
 
 	// abstract so don't edit here
@@ -216,8 +279,7 @@ public abstract class Critter {
 	public abstract boolean fight(String oponent);
 	
 	
-	
-	/* to do*/ 
+	 
 	/**
 	 * create and initialize a Critter subclass.
 	 * critter_class_name must be the unqualified name of a concrete subclass of Critter, if not,
@@ -229,8 +291,6 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	
-	
-	//Needs to be tested 
 	//Needs to have an exception thing
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		//plug in error later in stage 3 
@@ -238,7 +298,8 @@ public abstract class Critter {
 		
 		//need try catches for checking valid constructors
 		try{
-			Constructor build = null; 
+			newCritterCons = Class.forName(critter_class_name); 
+			Constructor<?> build = null; 
 			build = newCritterCons.getConstructor(); 
 			// Critter Initialization
 			//!!!!!!If we add traits, add it here too!!!!!!
@@ -246,6 +307,7 @@ public abstract class Critter {
 			((Critter) newCrit).x_coord = Critter.getRandomInt(Params.world_width);
 			((Critter) newCrit).y_coord = Critter.getRandomInt(Params.world_height);
 			((Critter) newCrit).energy = Params.start_energy;
+			((Critter) newCrit).isAlive = true; 
 			population.add((Critter) newCrit);
 		}
 		catch (Exception e){
@@ -345,7 +407,7 @@ public abstract class Critter {
 		}
 		
 		
-		/* to do */ 
+		//don't edit unless we add more varaibles
 		/*
 		 * This method getPopulation has to be modified by you if you are not using the population
 		 * ArrayList that has been provided in the starter code.  In any case, it has to be
@@ -355,8 +417,7 @@ public abstract class Critter {
 			return population;
 		}
 		
-		
-		//?????
+		//don't edit unless we add more varaibles
 		/*
 		 * This method getBabies has to be modified by you if you are not using the babies
 		 * ArrayList that has been provided in the starter code.  In any case, it has to be
@@ -375,20 +436,100 @@ public abstract class Critter {
 	 * These functions are part of abstract class
 	 */
 	public static void clearWorld() {
-		// Complete this method.
+		List<Critter> population2 = new java.util.ArrayList<Critter>();
+		//Iterator<Critter> it = population.iterator(); 
+		for(Critter c: population){
+			population2.add(c); 
+		}
+		population.removeAll(population2); 
 	}
 	
 	public static void worldTimeStep() {
 		// Complete this method.
 		//doTimeStep 
+		for (Critter c: population){
+			c.doTimeStep();
+			c.move = false; 
+			if (c.energy <= 0){
+				c.isAlive = false; 
+			}
+		}
+		
 		//move/run/walk/fight
 		//update energy 
-		//have babies?
+		
+		//have babies
+		for (Critter b : babies){
+			b.isAlive = true; 
+			population.add(b); 
+		}
+		babies.removeAll(babies); 
+		
+		
+		//clean up 
+		List<Critter> population2 = new java.util.ArrayList<Critter>();
+		for (Critter c : population){
+			if (!c.isAlive || c.energy <= 0){
+				population2.add(c); 
+			}
+		}
+		population.removeAll(population2); 
 	}
 	
+	/** 
+	 * Creates ASCII art to display the world as grid of symbols
+	 */
 	public static void displayWorld() {
-		// Complete this method.
-		//does the ASCII Art 
+		//2D Map of the world 
+		String[][] world = new String[Params.world_height + 2][Params.world_width + 2]; 
+		
+		//for each row in the world, print line by line like 460M
+		for (int i = 0; i < Params.world_height + 2; i++){
+			//next go by pixel by pixel like 460M
+			for (int j = 0; j < Params.world_width + 2; j++){
+				
+				//print border 
+				if(i == 0 || i == Params.world_height + 1){
+					//conner 
+					if (j == 0 || j == Params.world_width + 1){
+						world[i][j] = "+"; 
+						continue;  
+					}
+					//top/bottom
+					else{
+						world[i][j] = "-"; 
+					}
+				}
+				
+				//Sides
+				else if (j == 0 || j == Params.world_width + 1){
+					world[i][j] = "|"; 
+				}
+				
+				//space and reservations for critters
+				else{
+					world[i][j] = " "; 
+				}
+			}
+		}
+		
+		//fill in the spaces/reservations with critters
+		for  (Critter c: population){
+			//update map with critter with offset
+			world[c.y_coord + 1][c.x_coord + 1] = c.toString(); 
+		}
+		
+		//print row by row
+		for (int h = 0; h < Params.world_height + 2; h ++){
+			//print column like column like making the map above
+			for (int k = 0; k < Params.world_width + 2; k++){
+				System.out.print(world[h][k]);
+			}
+			//seperate rows
+			System.out.print("\n");
+		}
+			
+			
 		
 	}
 }
