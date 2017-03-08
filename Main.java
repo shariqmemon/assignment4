@@ -12,6 +12,7 @@ package assignment4;
  * Fall 2016
  */
 
+import java.util.List;
 import java.util.Scanner;
 import java.io.*;
 
@@ -68,9 +69,146 @@ public class Main {
         }
 
         /* Do not alter the code above for your submission. */
+        
+        ///////////////////////////////////////////////////////////////
         /* Write your code below. */
         
-        // System.out.println("GLHF");
+        Scanner user = new Scanner(System.in); 
+        String command = user.nextLine(); 
+        boolean go = true; 
+        
+        //leave by changing flag
+        if(command.equals("quit")){
+        	go = false; 
+        }
+        
+        //call display b/c show
+        //working
+        if(command.equals("show")){
+        	Critter.displayWorld();
+        }
+        
+        //get number and perform number of steps
+        //working
+        //doesn't do anything unless make was called earlier
+        if(command.contains("step")){
+        	String[] command1 = command.split(" "); 
+        	//empty steps
+        	if(command1.length == 1){
+        		Critter.worldTimeStep();
+        	}
+        	else{
+        		int num = Integer.parseInt(command1[1]); 
+            	for (int i = 0; i < num; i++){
+            		Critter.worldTimeStep();
+            	}
+        	}
+        }
+        
+        //set the given seed
+        //working
+        if(command.contains("seed")){
+        	String[] command1 = command.split(" "); 
+        	int num = Integer.parseInt(command1[1]); 
+        	Critter.setSeed(num);
+        }
+        
+        //for each number call the constructor of that class
+    	//reason why we need the expection 
+        //working
+        if(command.contains("make")){
+        	String[] command1 = command.split(" "); 
+        	String name = command1[1];
+        	//no number
+        	if (command1.length == 2){
+        		try{
+        			//check piazza before continuing 
+        			String full = myPackage; 
+        			full = full + "." + name;  
+        			//System.out.println(full);
+        			Critter.makeCritter(full);
+        		}
+        		catch(InvalidCritterException e){
+        			System.out.println("" + name + " is not a valid critter class.");
+        		}
+        	}
+        	//number
+        	else{
+        		int num = Integer.parseInt(command1[2]);
+        		String full = myPackage; 
+    			full = full + "." + name;
+            	for (int i = 0; i < num; i++){
+            		try{
+            			Critter.makeCritter(full);
+            		}
+            		catch(InvalidCritterException e){
+            			System.out.println("" + name + " is not a valid critter class.");
+            			break; 
+            		}
+            	}
+        	}
+        	
+        }
+        
+        //call getInstances and runStats
+        //check later
+        if(command.contains("stat")){
+        	String[] command1 = command.split(" "); 
+        	String name = command1[1];
+        	List<Critter> toStat = null; 
+        	String full = myPackage; 
+			full = full + "." + name;
+        	try{
+        		toStat = Critter.getInstances(full); 
+        	}
+        	catch (InvalidCritterException e){
+        		e.printStackTrace();
+        	}
+        	if (toStat.size() <= 0){
+        		System.out.println("No instances of " + name + " are alive");
+        	}
+        	
+        	//Java magic from stack over flow about making it qualified
+        	Class<?> crit = null; 
+        	Class [] Paraman = new Class[1]; 
+        	Paraman[0] = java.util.List.class; 
+        	
+        	try{
+        		crit = Class.forName(name); 
+        		java.lang.reflect.Method runStats = crit.getMethod("runStats", Paraman); 
+        		runStats.invoke(crit, toStat); 
+        	}
+        	catch(Exception e){
+        		e.printStackTrace(); 
+        	}
+        }
+        
+        //////////////////////Testing Block//////////////////////////////
+        //Running 
+        System.out.println("GLHF");
+        //constructor - changed craig to test babies
+        try{
+        	Critter.makeCritter("assignment4.Craig");
+        }
+        catch (InvalidCritterException e){
+        	System.out.println("No Craig");
+        }
+        //view
+        Critter.displayWorld();
+        //walk/time step/babies 
+        Craig.worldTimeStep();
+        Critter.displayWorld(); 
+        //delete/clear world 
+        Critter.clearWorld(); 
+        Critter.displayWorld();
+        int x = 10; 
+        x ++; 
+        ////////////////////////////////////////////////////////////////
+        
+      
+        
+      
+        
         
         /* Write your code above */
         System.out.flush();
