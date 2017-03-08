@@ -74,114 +74,158 @@ public class Main {
         /* Write your code below. */
         
         Scanner user = new Scanner(System.in); 
-        String command = user.nextLine(); 
+        //String command = user.nextLine(); 
         boolean go = true; 
         
-        //leave by changing flag
-        if(command.equals("quit")){
-        	go = false; 
-        }
-        
-        //call display b/c show
-        //working
-        if(command.equals("show")){
-        	Critter.displayWorld();
-        }
-        
-        //get number and perform number of steps
-        //working
-        //doesn't do anything unless make was called earlier
-        if(command.contains("step")){
-        	String[] command1 = command.split(" "); 
-        	//empty steps
-        	if(command1.length == 1){
-        		Critter.worldTimeStep();
+        //while user wants to type
+        while (go){
+        	String command = user.nextLine(); 
+        	
+        	//throw away arguments that are too big
+        	if (command.split(" ").length > 3){
+        		System.out.println("error processing: " + command);
         	}
-        	else{
-        		int num = Integer.parseInt(command1[1]); 
-            	for (int i = 0; i < num; i++){
+        	
+        	//leave by changing flag
+        	else if(command.equals("quit")){
+            	go = false; 
+            	break; 
+            }
+            
+            //call display b/c show
+            //working
+        	else if(command.equals("show")){
+            	Critter.displayWorld();
+            }
+            
+            //get number and perform number of steps
+            //working
+            //doesn't do anything unless make was called earlier
+        	else if(command.contains("step")){
+            	String[] command1 = command.split(" "); 
+            	
+            	//only takes 1-2 arguements 
+            	if (command1.length > 2){
+            		System.out.println("error processing: " + command);
+            	}
+            	
+            	//1 argument
+            	if(command1.length == 1){
             		Critter.worldTimeStep();
             	}
-        	}
-        }
-        
-        //set the given seed
-        //working
-        if(command.contains("seed")){
-        	String[] command1 = command.split(" "); 
-        	int num = Integer.parseInt(command1[1]); 
-        	Critter.setSeed(num);
-        }
-        
-        //for each number call the constructor of that class
-    	//reason why we need the expection 
-        //working
-        if(command.contains("make")){
-        	String[] command1 = command.split(" "); 
-        	String name = command1[1];
-        	//no number
-        	if (command1.length == 2){
-        		try{
-        			//check piazza before continuing 
-        			String full = myPackage; 
-        			full = full + "." + name;  
-        			//System.out.println(full);
-        			Critter.makeCritter(full);
-        		}
-        		catch(InvalidCritterException e){
-        			System.out.println("" + name + " is not a valid critter class.");
-        		}
-        	}
-        	//number
-        	else{
-        		int num = Integer.parseInt(command1[2]);
-        		String full = myPackage; 
-    			full = full + "." + name;
-            	for (int i = 0; i < num; i++){
+            	
+            	//2 arguments 
+            	else{
             		try{
+            			int num = Integer.parseInt(command1[1]); 
+                    	for (int i = 0; i < num; i++){
+                    		Critter.worldTimeStep();
+                    	}
+            		}
+            		catch (IllegalArgumentException e){
+            			System.out.println("error processing: " + command);
+            			continue; 
+            		}
+            		
+            	}
+            }
+            
+            //set the given seed
+            //working
+        	else if(command.contains("seed")){
+            	String[] command1 = command.split(" "); 
+            	int num = Integer.parseInt(command1[1]); 
+            	Critter.setSeed(num);
+            }
+            
+            //for each number call the constructor of that class
+        	//reason why we need the expection 
+            //working
+        	else if(command.contains("make")){
+            	String[] command1 = command.split(" "); 
+            	String name = command1[1];
+            	
+            	//1 argument 
+            	if (command1.length == 2){
+            		try{
+            			String full = myPackage; 
+            			full = full + "." + name;  
             			Critter.makeCritter(full);
             		}
+            		//check name exists
             		catch(InvalidCritterException e){
             			System.out.println("" + name + " is not a valid critter class.");
-            			break; 
             		}
             	}
-        	}
-        	
+            	
+            	//2 arguments
+            	else{
+            		try{
+            			//see if integers exists
+            			int num = Integer.parseInt(command1[1]); 
+                		String full = myPackage; 
+            			full = full + "." + name;
+                    	for (int i = 0; i < num; i++){
+                    		//see if critter name exists 
+                    		try{
+                    			Critter.makeCritter(full);
+                    		}
+                    		catch(InvalidCritterException e){
+                    			System.out.println("" + name + " is not a valid critter class.");
+                    			break; 
+                    		}
+                    	}
+            		}
+            		catch (IllegalArgumentException e){
+            			System.out.println("error processing: " + command);
+            			continue; 
+            		}
+            		
+            	}
+            	
+            }
+            
+            //call getInstances and runStats
+            //check later
+        	else if(command.contains("stat")){
+            	String[] command1 = command.split(" "); 
+            	String name = command1[1];
+            	List<Critter> toStat = null; 
+            	String full = myPackage; 
+    			full = full + "." + name;
+    			//see if critter name exists
+            	try{
+            		toStat = Critter.getInstances(full); 
+            	}
+            	catch (InvalidCritterException e){
+            		e.printStackTrace();
+            	}
+            	if (toStat.size() <= 0){
+            		System.out.println("No instances of " + name + " are alive");
+            	}
+            	
+            	//reflection and qualified magic 
+            	Class<?> crit = null; 
+            	Class [] Paraman = new Class[1]; 
+            	Paraman[0] = java.util.List.class; 
+            	
+            	//see if critter exists and runStats exists 
+            	try{
+            		crit = Class.forName(name); 
+            		java.lang.reflect.Method runStats = crit.getMethod("runStats", Paraman); 
+            		runStats.invoke(crit, toStat); 
+            	}
+            	catch(Exception e){
+            		System.out.println("error processing: " + command); 
+            	}
+            }
+            //else an invalid command
+            else{
+            	System.out.println("invalid command: " + command );
+            }
+            
         }
-        
-        //call getInstances and runStats
-        //check later
-        if(command.contains("stat")){
-        	String[] command1 = command.split(" "); 
-        	String name = command1[1];
-        	List<Critter> toStat = null; 
-        	String full = myPackage; 
-			full = full + "." + name;
-        	try{
-        		toStat = Critter.getInstances(full); 
-        	}
-        	catch (InvalidCritterException e){
-        		e.printStackTrace();
-        	}
-        	if (toStat.size() <= 0){
-        		System.out.println("No instances of " + name + " are alive");
-        	}
-        	
-        	//Java magic from stack over flow about making it qualified
-        	Class<?> crit = null; 
-        	Class [] Paraman = new Class[1]; 
-        	Paraman[0] = java.util.List.class; 
-        	
-        	try{
-        		crit = Class.forName(name); 
-        		java.lang.reflect.Method runStats = crit.getMethod("runStats", Paraman); 
-        		runStats.invoke(crit, toStat); 
-        	}
-        	catch(Exception e){
-        		e.printStackTrace(); 
-        	}
-        }
+       
         
         //////////////////////Testing Block//////////////////////////////
         //Running 
