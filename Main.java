@@ -1,15 +1,16 @@
 package assignment4;
 /* CRITTERS Main.java
+
  * EE422C Project 4 submission by
  * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * Haley Alexander
+ * ha5722
+ * 16215
+ * Shariq Memon
+ * skm2662
+ * 16215
  * Slip days used: <0>
- * Fall 2016
+ * Spring 2017
  */
 
 import java.util.List;
@@ -73,13 +74,13 @@ public class Main {
         ///////////////////////////////////////////////////////////////
         /* Write your code below. */
         
-        Scanner user = new Scanner(System.in); 
+        //Scanner user = new Scanner(System.in); 
         //String command = user.nextLine(); 
         boolean go = true; 
         
         //while user wants to type
         while (go){
-        	String command = user.nextLine(); 
+        	String command = kb.nextLine(); 
         	
         	//throw away arguments that are too big
         	if (command.split(" ").length > 3){
@@ -89,13 +90,20 @@ public class Main {
         	//leave by changing flag
         	else if(command.equals("quit")){
             	go = false; 
+            	kb.close(); 
             	break; 
             }
             
             //call display b/c show
             //working
-        	else if(command.equals("show")){
-            	Critter.displayWorld();
+        	else if(command.contains("show")){
+        		if (command.equals("show")){
+        			Critter.displayWorld();
+        		}
+        		else{
+        			System.out.println("error processing: " + command);
+        		}
+            	
             }
             
             //get number and perform number of steps
@@ -134,8 +142,13 @@ public class Main {
             //working
         	else if(command.contains("seed")){
             	String[] command1 = command.split(" "); 
-            	int num = Integer.parseInt(command1[1]); 
-            	Critter.setSeed(num);
+            	if (command1.length > 2){
+            		System.out.println("error processing: "  + command); 
+            	}
+            	else{
+            		int num = Integer.parseInt(command1[1]); 
+                	Critter.setSeed(num);
+            	}
             }
             
             //for each number call the constructor of that class
@@ -143,12 +156,18 @@ public class Main {
             //working
         	else if(command.contains("make")){
             	String[] command1 = command.split(" "); 
-            	String name = command1[1];
+            	
+            	//0 arguments
+            	if  (command1.length == 1){
+            		System.out.println("error processing: " + command);
+            	}
             	
             	//1 argument 
-            	if (command1.length == 2){
+            	else if (command1.length == 2){
+            		String name = command1[1]; 
             		try{
             			String full = myPackage; 
+            			
             			full = full + "." + name;  
             			Critter.makeCritter(full);
             		}
@@ -160,9 +179,10 @@ public class Main {
             	
             	//2 arguments
             	else{
+            		String name = command1[1]; 
             		try{
             			//see if integers exists
-            			int num = Integer.parseInt(command1[1]); 
+            			int num = Integer.parseInt(command1[2]); 
                 		String full = myPackage; 
             			full = full + "." + name;
                     	for (int i = 0; i < num; i++){
@@ -187,36 +207,42 @@ public class Main {
             
             //call getInstances and runStats
             //check later
-        	else if(command.contains("stat")){
+        	else if(command.contains("stats")){
+        		
             	String[] command1 = command.split(" "); 
-            	String name = command1[1];
-            	List<Critter> toStat = null; 
-            	String full = myPackage; 
-    			full = full + "." + name;
-    			//see if critter name exists
-            	try{
-            		toStat = Critter.getInstances(full); 
+            	if (command1.length > 2){
+            		System.out.println("invalid command: " + command );
             	}
-            	catch (InvalidCritterException e){
-            		e.printStackTrace();
-            	}
-            	if (toStat.size() <= 0){
-            		System.out.println("No instances of " + name + " are alive");
-            	}
-            	
-            	//reflection and qualified magic 
-            	Class<?> crit = null; 
-            	Class [] Paraman = new Class[1]; 
-            	Paraman[0] = java.util.List.class; 
-            	
-            	//see if critter exists and runStats exists 
-            	try{
-            		crit = Class.forName(name); 
-            		java.lang.reflect.Method runStats = crit.getMethod("runStats", Paraman); 
-            		runStats.invoke(crit, toStat); 
-            	}
-            	catch(Exception e){
-            		System.out.println("error processing: " + command); 
+            	else{
+                	String name = command1[1];
+                	List<Critter> toStat = null; 
+                	String full = myPackage; 
+        			full = full + "." + name;
+        			//see if critter name exists
+                	try{
+                		toStat = Critter.getInstances(full); 
+                	}
+                	catch (InvalidCritterException e){
+                		e.printStackTrace();
+                	}
+                	/*if (toStat.size() <= 0){
+                		System.out.println("No instances of " + name + " are alive");
+                	}*/ 
+                	
+                	//reflection and qualified magic 
+                	Class<?> crit = null; 
+                	Class [] Paraman = new Class[1]; 
+                	Paraman[0] = java.util.List.class; 
+                	
+                	//see if critter exists and runStats exists 
+                	try{
+                		crit = Class.forName(full); 
+                		java.lang.reflect.Method runStats = crit.getMethod("runStats", Paraman); 
+                		runStats.invoke(crit, toStat); 
+                	}
+                	catch(Exception e){
+                		System.out.println("error processing: " + command); 
+                	}
             	}
             }
             //else an invalid command
@@ -228,32 +254,8 @@ public class Main {
        
         
         //////////////////////Testing Block//////////////////////////////
-        //Running 
-        System.out.println("GLHF");
-        //constructor - changed craig to test babies
-        try{
-        	Critter.makeCritter("assignment4.Craig");
-        }
-        catch (InvalidCritterException e){
-        	System.out.println("No Craig");
-        }
-        //view
-        Critter.displayWorld();
-        //walk/time step/babies 
-        Craig.worldTimeStep();
-        Critter.displayWorld(); 
-        //delete/clear world 
-        Critter.clearWorld(); 
-        Critter.displayWorld();
-        int x = 10; 
-        x ++; 
         ////////////////////////////////////////////////////////////////
-        
-      
-        
-      
-        
-        
+
         /* Write your code above */
         System.out.flush();
 
