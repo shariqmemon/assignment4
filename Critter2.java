@@ -14,7 +14,7 @@ package assignment4;
 
 public class Critter2 extends Critter{
 	private int direction; 
-	private int numSteps; 
+	private int numSteps1; 
 	private boolean moved; 
 	
 	/***
@@ -22,7 +22,7 @@ public class Critter2 extends Critter{
 	 */
 	public Critter2(){
 		direction = Critter.getRandomInt(8); 
-		numSteps++; 
+		numSteps1 = 0; 
 		moved = false; 
 	}
 	
@@ -51,12 +51,12 @@ public class Critter2 extends Critter{
 		else if (Critter.getRandomInt(100) % 2 == 0){
 			walk(direction); 
 			moved = true; 
-			numSteps++; 
+			numSteps1++; 
 		}
 		else{
 			run(direction); 
 			moved = true; 
-			numSteps = numSteps + 2; 
+			numSteps1 = numSteps1 + 2; 
 		}
 		
 		direction = getEnergy() * Critter.getRandomInt(8) % 8; 
@@ -73,6 +73,7 @@ public class Critter2 extends Critter{
 			moved = true; 
 			return false; 
 		}
+		
 		else{ 
 			return true; 
 		}
@@ -82,14 +83,14 @@ public class Critter2 extends Critter{
 	 * Going to print number steps since it is random 
 	 */
 	public static void runStats(java.util.List<Critter> theCritter2){
-		int total_fights = 0; 
-		int total_babies = 0; 
+		int total_steps = 0; 
 		for(Object a : theCritter2){
 			Critter2 critt = (Critter2) a; 
+			total_steps = total_steps + critt.numSteps1; 
+			}
 			
-		}
-		System.out.println("Total number of Crtiter1's: " + theCritter2.size()); 
-		System.out.println("Total number of fights: " + total_fights);
-		System.out.println("Total number of babies: " + total_babies); 
+		
+		System.out.println("Total number of Critter2's: " + theCritter2.size()); 
+		System.out.println("Total number of steps: " + total_steps); 
 	}
 }
