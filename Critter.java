@@ -443,7 +443,10 @@ public abstract class Critter {
 		}
 		population.removeAll(population2); 
 	}
-	
+
+
+	// -------- DO WORLD TIME STEP()
+
 	public static void worldTimeStep() {
 		// Complete this method.
 		//doTimeStep 
@@ -454,7 +457,22 @@ public abstract class Critter {
 				c.isAlive = false; 
 			}
 		}
-		
+		for(Critter c: population){
+			for(Critter d: population)
+			{
+				if(c == d)
+				{
+					continue;
+				}
+				else if(coordcheck(c,d))
+				{
+					fighting(c,d);
+				}
+
+			}
+
+
+		}
 		//move/run/walk/fight
 		//update energy 
 		
@@ -475,7 +493,100 @@ public abstract class Critter {
 		}
 		population.removeAll(population2); 
 	}
-	
+	public static boolean coordcheck(Critter a, Critter b)
+	{
+		if((a.x_coord == b.x_coord)&& (a.y_coord == b.y_coord))
+		{
+			return true;
+		}
+		return false;
+	}
+
+
+	public static void fighting(Critter a , Critter b) {
+		if (a.isAlive() && b.isAlive()) {
+			int x = a.x_coord;
+			int y = a.y_coord;
+			boolean a_fight = a.fight(b.toString());
+			if (a.energy <= 0) {
+				a.isAlive = false;
+			}
+			if (a.isOccupied()) {
+				a.x_coord = x;
+				a.y_coord = y;
+			}
+			x = b.x_coord;
+			y = b.y_coord;
+			boolean b_fight = b.fight(a.toString());
+			if (b.energy <= 0) {
+				b.isAlive = false;
+			}
+			if (b.isOccupied()) {
+				b.x_coord = x;
+				b.y_coord = y;
+			}
+			// If running away, a or b may die, or a or b may get away.
+			if (coordcheck(a, b)) {
+				if (a.isAlive() && b.isAlive()) {
+					// If there's still a conflict, time to duke it out.
+					int a_roll, b_roll;
+					if (a_fight) {
+						a_roll = Critter.getRandomInt(a.energy);
+					} else {
+						a_roll = 0;
+					}
+					if (b_fight) {
+						b_roll = Critter.getRandomInt(b.energy);
+					} else {
+						b_roll = 0;
+					}
+
+					if (a_roll > b_roll) {
+						// A wins
+						a.energy = a.energy + (b.energy) / 2;
+						b.energy = 0;
+						b.isAlive = false;
+					} else if (b_roll > a_roll) {
+						// B wins
+						b.energy = b.energy + (a.energy) / 2;
+						a.energy = 0;
+						a.isAlive = false;
+					}
+					// Coin flip.
+					else {
+						int flip = Critter.getRandomInt(2);
+						if (flip == 1) {
+							// A wins
+							a.energy = a.energy + (b.energy) / 2;
+							b.energy = 0;
+							b.isAlive = false;
+						} else {
+							// B wins
+							b.energy = b.energy + (a.energy) / 2;
+							a.energy = 0;
+							a.isAlive = false;
+						}
+					}
+				}
+			}
+
+		}
+	}
+
+	private boolean isAlive() {
+		return isAlive;
+	}
+	private boolean isOccupied(){
+		for(Critter a : population)
+		{
+			if(a == this){continue;}
+			if(coordcheck(a,this))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	/** 
 	 * Creates ASCII art to display the world as grid of symbols
 	 */
